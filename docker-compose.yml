@@ -1,0 +1,20 @@
+version: '3'
+services:
+  service:
+    image: node:10.16
+    volumes:
+      - ./:/app
+    working_dir: /app
+    ports:
+      - 0.0.0.0:8000:8000
+    depends_on:
+      - mongo
+    command: ['yarn', 'dev']
+    restart: always
+  mongo:
+    image: mongo:4.2
+    volumes:
+      - ./mongo/db:/data/db
+    restart: always
+    ports:
+      - 27017:27017
