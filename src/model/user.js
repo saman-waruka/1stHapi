@@ -1,24 +1,34 @@
 const mongoose = require('mongoose') ;
+var mongoose_delete = require('mongoose-delete');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-  id: { type: Number, required: true},
   name: { type: String, required: true },
   last_name: { type: String, required: true },
-  soft_delete: { type: Boolean,default: false  }
+  profile: {type: Object}
+},{
+  timestamps: true
 });
 
+UserSchema.plugin(mongoose_delete);
 // Do not use arrow syntax here - Prevents binding of this, so this would not refer to 
 UserSchema.methods.adduser = function (user) {
   return this.save();
 };
 
 UserSchema.statics.findAll = function () {
-    return this.find({});
+    return this.find({ deleted: false});
   };
 
+UserSchema.statics.findAllActual = function () {
+  return this.find({});
+};
+
 UserSchema.statics.findByID = function(id) {
-  return this.find({ id: id});
+  return this.find({ _id: id, deleted: false});
+};
+UserSchema.statics.findByIDActual = function(id) {
+  return this.find({ _id: id});
 };
 
 UserSchema.query.byName = function(name) {
@@ -26,24 +36,18 @@ UserSchema.query.byName = function(name) {
 }
 
 UserSchema.query.update = function(id,newData) {
-    const query = { id : id};
+    const query = { _id : id};
     return this.updateOne(query, newData);
 }
 
 UserSchema.statics.deleteById = function(id) {
-  const query = { id : id};
+  const query = { _id : id};
   return this.findOneAndDelete(query);
 }
 
 UserSchema.statics.softDeleteById = function(id) {
-  const query = { id : id};
+  const query = { _id : id};
   const softD = {soft_delete: true}
-  return this.findOneAndUpdate(query, softD);
-}
-
-UserSchema.query.restoreById = function(id) {
-  const query = { id : id};
-  const softD = {soft_delete: false}
   return this.findOneAndUpdate(query, softD);
 }
 

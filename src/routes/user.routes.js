@@ -1,8 +1,12 @@
 
 
 const AuthBearer = require('hapi-auth-bearer-token');
-const { addUser, getAllUsers, getUserById, updateUserById, deleteManage, restoreUserById } = require('../controller/user.controller');
-const { idValidate, permanentDeleteQuery } = require('../validators/requests.validators')
+const { 
+    addUser, getAllUsers, getUserById, 
+    updateUserById, deleteManage, restoreUserById , 
+    getAllUsersAvailable, getUserByIdActual 
+} = require('../controller/user.controller');
+const { idValidate, permanentDeleteQuery, nameLastnameVaidate } = require('../validators/requests.validators')
 
 
 module.exports = async server => {
@@ -23,18 +27,47 @@ module.exports = async server => {
             path: '/api/users',
             handler: addUser,
             options: {
-                auth: 'simple'
+                auth: 'simple',
+                validate: {
+                    payload: nameLastnameVaidate
+                }
+            }
+        },
+        {
+            method: 'POST',
+            path: '/api/users/restore/{id}',
+            handler: restoreUserById,
+            options: {
+                auth: 'simple',
+                validate: {
+                    params: idValidate
+                }
             }
         },
         {
             method: 'GET',
             path: '/api/users',
+            handler: getAllUsersAvailable
+        },
+        {
+            method: 'GET',
+            path: '/api/users/actual',
             handler: getAllUsers
         },
         {
             method: 'GET',
             path: '/api/users/{id}',
             handler: getUserById,
+            options: {
+                validate: {
+                    params: idValidate
+                }
+            }
+        },
+        {
+            method: 'GET',
+            path: '/api/users/actual/{id}',
+            handler: getUserByIdActual,
             options: {
                 validate: {
                     params: idValidate
@@ -60,17 +93,6 @@ module.exports = async server => {
                 validate: {
                     params: idValidate,
                     query: permanentDeleteQuery
-                },
-                auth: 'simple'
-            }
-        } ,
-        {
-            method: 'POST',
-            path: '/api/users/{id}/restore',
-            handler: restoreUserById,
-            options: {
-                validate: {
-                    params: idValidate
                 },
                 auth: 'simple'
             }

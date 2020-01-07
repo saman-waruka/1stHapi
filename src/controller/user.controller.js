@@ -2,15 +2,15 @@
 const { UsersModel } = require('../model/user');
 
 const addUser = (request, h) => {
-    const _user = request.payload;
-    console.log(_user)
-    const user = new UsersModel(Object.assign({}, _user));
+    const userData = request.payload;
+    console.log(userData)
+    const user = new UsersModel(Object.assign({}, userData));
     user.save();
     return "user added :"+ user;
 }
 
 const getAllUsers = (request, h) => {
-    const query = UsersModel.findAll();
+    const query = UsersModel.findAllActual();
     const result = query.exec();
     return result;
 }
@@ -21,12 +21,17 @@ const getUserById = (request, h) => {
     const result = query.exec();
     return result;
 } 
+
+const getUserByIdActual = (request, h) => {
+    const { id } = request.params;
+    const query = UsersModel.findByIDActual(id);
+    const result = query.exec();
+    return result;
+} 
+
 const updateUserById = (request, h) => {
     const { id } = request.params;
-    const userData = {
-        name: request.payload.name,
-        last_name: request.payload.last_name,
-      };
+    const userData = request.payload;
     const query = UsersModel.update(id,userData);
     const result = query.exec();
     return result;
@@ -39,9 +44,20 @@ const deleteUserById = (request, h) => {
     return result;
 }
 
-const softDeleteUserById = (request, h) => {
-    const { id} = request.params;
-    const query = UsersModel.softDeleteById(id);
+const deleteMongooseDelete = async (request, h) => {
+        const { id} = request.params;
+        const query = UsersModel.findByID(id);
+        const _user = await query.exec();
+        if(_user[0]) {
+            const user = new UsersModel(_user[0]);
+            const result = user.delete();
+            return result;
+        }
+        return [];
+} 
+
+const getAllUsersAvailable = (request, h) => {
+    const query = UsersModel.findAll();
     const result = query.exec();
     return result;
 }
@@ -53,16 +69,21 @@ const deleteManage = (request, h) => {
     if(isPermanentDelete) {
         return deleteUserById(request, h);
     } else {
-        return softDeleteUserById(request, h);
+        // return softDeleteUserById(request, h);
+        return deleteMongooseDelete(request, h);
     }
-
 }
 
-const restoreUserById = (request, h) => {
+const restoreUserById = async (request, h) => {
     const { id} = request.params;
-    const query = UsersModel.restoreById(id);
-    const result = query.exec();
-    return result;
+    const query = UsersModel.findByIDActual(id);
+    const _user = await query.exec();
+    if(_user[0]) {
+        const user = new UsersModel(_user[0]);
+        const result = user.restore();
+        return result;
+    }
+    return [];
 }
 
 module.exports = {
@@ -71,5 +92,7 @@ module.exports = {
     getUserById,
     updateUserById,
     deleteManage,
-    restoreUserById
+    restoreUserById,
+    getAllUsersAvailable,
+    getUserByIdActual
 }
