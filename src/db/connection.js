@@ -3,7 +3,7 @@ require('dotenv').config();
 
 Mongoose.Promise = global.Promise;
 const uri=process.env.MONGOOS_URI
-Mongoose.connect(uri,{ useNewUrlParser: true } );
+Mongoose.connect(uri,{ useNewUrlParser: true,useUnifiedTopology: true } );
 
 const db = Mongoose.connection;
 
