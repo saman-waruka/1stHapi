@@ -64,7 +64,7 @@ const getAllUsersAvailable = (request, h) => {
 
 const deleteManage = (request, h) => {
     console.log(request.query)
-    const isPermanentDelete = String(request.query.permanent).toLowerCase()=== 'true' ;
+    const isPermanentDelete = String(request.query.permanent).toLowerCase()=== 'true';
     console.log(isPermanentDelete)
     if(isPermanentDelete) {
         return deleteUserById(request, h);
@@ -75,7 +75,7 @@ const deleteManage = (request, h) => {
 }
 
 const restoreUserById = async (request, h) => {
-    const { id} = request.params;
+    const { id } = request.params;
     const query = UsersModel.findByIDActual(id);
     const _user = await query.exec();
     if(_user[0]) {

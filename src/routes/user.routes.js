@@ -15,7 +15,7 @@ module.exports = async server => {
     server.auth.strategy('simple', 'bearer-access-token', {
         allowQueryToken: true,              // optional, false by default
         validate: async (request, token, h) => {
-            const isValid = token === '20scoops';
+            const isValid = token === process.env.TOKEN;
             const credentials = { token };
             const artifacts = { test: 'info' };
             return { isValid, credentials, artifacts };
@@ -88,6 +88,18 @@ module.exports = async server => {
         {
             method: 'DELETE',
             path: '/api/users/{id}',
+            handler: deleteManage,
+            options: {
+                validate: {
+                    params: idValidate,
+                    query: permanentDeleteQuery
+                },
+                auth: 'simple'
+            }
+        },
+        {
+            method: 'DELETE',
+            path: '/api/users/{id}/soft',
             handler: deleteManage,
             options: {
                 validate: {

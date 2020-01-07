@@ -45,12 +45,6 @@ UserSchema.statics.deleteById = function(id) {
   return this.findOneAndDelete(query);
 }
 
-UserSchema.statics.softDeleteById = function(id) {
-  const query = { _id : id};
-  const softD = {soft_delete: true}
-  return this.findOneAndUpdate(query, softD);
-}
-
 const UsersModel = mongoose.model('UsersModel', UserSchema);
 
 module.exports = {

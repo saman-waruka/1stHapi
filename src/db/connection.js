@@ -3,8 +3,10 @@ require('dotenv').config();
 
 Mongoose.Promise = global.Promise;
 const uri=process.env.MONGOOS_URI
-Mongoose.connect(uri,{ useNewUrlParser: true,useUnifiedTopology: true } );
 
+const connectDB = () => {
+  Mongoose.connect(uri,{ useNewUrlParser: true,useUnifiedTopology: true } );
+}
 const db = Mongoose.connection;
 
 db.on('error', (error) => {
@@ -17,5 +19,6 @@ db.once('open', () => {
 
 // export default db;
 module.exports = {
-    db: db
+    db,
+    connectDB
 }

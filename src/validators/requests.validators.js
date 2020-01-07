@@ -8,8 +8,7 @@ const permanentDeleteQuery = Joi.object({
 
 const nameLastnameVaidate = Joi.object({
     name: Joi.string().required(),
-    last_name: Joi.string().required(),
-    profile: Joi.object()
+    last_name: Joi.string().required()
 })
 
 module.exports = {
